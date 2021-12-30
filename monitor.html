@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Whispers</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css"/>
+    <style>
+        body {
+            display: grid;
+            padding: 1ex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            grid-auto-rows: auto 1fr auto;
+        }
+        header {
+            grid-row: 1;
+        }
+        footer {
+            grid-row: 3;
+        }
+        main {
+            grid-row: 2;
+            margin: 1ex 0;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+        main p {
+            padding: 1ex;
+            margin: 1ex;
+            border-radius: 1ex;
+            display: inline-block;
+        }
+        main p.from {
+            align-self: flex-start;
+            background-color: #eee;
+        }
+        main p.to {
+            align-self: flex-end;
+            background-color: lightblue;
+        }
+        header, footer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        header>:first-child, footer>:first-child {
+            flex-grow: 1;
+        }
+        header>:last-child, footer>:not(:first-child) {
+            margin-left: 1ex;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Whispers</h1>
+    <label for="select">Conversation:</label>
+    <select id="select"></select>
+</header>
+<main id="target"></main>
+<footer>
+    <textarea id="text"></textarea>
+    <button id="send">Send</button>
+</footer>
+<script>
+    const
+        ids = [],
+        messages = {};
+
+    const
+        select = document.getElementById("select"),
+        output = document.getElementById("target"),
+        input = document.getElementById("text");
+
+    function updateMessages(id, data) {
+        messages[id].push(data);
+        if (id === select.value)
+            writeMessage(data);
+    }
+
+    function writeMessage(data) {
+        let p = document.createElement("p");
+        p.classList.add(data.type);
+        p.innerText = data.message;
+
+        let scrolled = output.scrollHeight - output.clientHeight <= output.scrollTop + 1
+        output.appendChild(p);
+        if (scrolled)
+            output.scrollTop = output.scrollHeight - output.clientHeight
+    }
+
+    select.onchange = e => {
+        output.innerHTML = "";
+        messages[e.target.value].forEach(t => writeMessage(t));
+    };
+
+    let socket = new WebSocket("ws://localhost:8080");
+
+    socket.onmessage = e => {
+        console.log(e);
+        let data = JSON.parse(e.data);
+        if (ids.indexOf(data.id) < 0) {
+            let first = ids.length === 0;
+            ids.push(data.id);
+            messages[data.id] = [];
+            let option = document.createElement("option");
+            option.innerText = data.name;
+            option.value = data.id;
+            if (first) option.selected = true;
+            select.appendChild(option);
+        }
+        updateMessages(data.id, {
+            message: data.message,
+            type: "from"
+        });
+    }
+
+    document.getElementById("send").onclick = () => {
+        let message = input.value;
+        if (message.length === 0) return;
+        socket.send(JSON.stringify({
+            id: select.value,
+            message: message
+        }));
+        updateMessages(select.value, {
+            message: message,
+            type: "to"
+        });
+        input.value = "";
+    };
+</script>
+</body>
+</html>

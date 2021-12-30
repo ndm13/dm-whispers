@@ -1,0 +1,21 @@
+{
+  "name": "dm-whispers",
+  "description": "Bridge between Discord DMs and WebSockets",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "npm run build && node build/index.js",
+    "dev": "nodemon",
+    "build": "rimraf ./build && tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.5",
+    "nodemon": "^2.0.15",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "discord.js": "^13.5.0"
+  }
+}
