@@ -18,13 +18,14 @@ client.login(discord.token)
 client.on('error', error => console.error(error));
 
 const server = new WebSocketServer({ port: 8080 });
-server.once('listening', () => console.log("[Websocket ] Server ready"));
+server.once('listening', () => console.log("[WebSocket ] Server ready"));
 
-let users = {};
+const users = {};
 server.on('connection', socket => {
-    console.log("[Websocket ] Connection established");
+    console.log("[WebSocket ] Connection established");
     client.on('messageCreate', message => {
-        console.log("[Discord.js] " + message.author.username, "says:", message.content);
+        if (message.author.id === discord.clientId) return;
+        console.log("[Discord.js] [" + message.author.id + "]", message.content);
         users["" + message.author.id] = message.author;
         socket.send(JSON.stringify({
             id: "" + message.author.id,
@@ -34,7 +35,11 @@ server.on('connection', socket => {
     });
     socket.on('message', message => {
         let data = JSON.parse(message.toString());
-        console.log("[Websocket ] To " + data.id + ": " + data.message);
+        console.log("[WebSocket ] [" + data.id + "]", data.message);
         users[data.id].send(data.message);
     });
+    socket.on('close', () => {
+        console.log("[WebSocket ] Connection closed");
+        client.removeAllListeners('messageCreate');
+    })
 });

@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css"/>
     <style>
         body {
+            font-family: sans-serif;
             display: grid;
-            padding: 1ex;
             position: fixed;
             top: 0;
             left: 0;
@@ -40,12 +40,15 @@
         }
         main p.to {
             align-self: flex-end;
-            background-color: lightblue;
+            background-color: #5865f2;
+            color: white;
         }
         header, footer {
+            padding: 1ex;
             display: flex;
             flex-direction: row;
             align-items: center;
+            background-color: #eee;
         }
         header>:first-child, footer>:first-child {
             flex-grow: 1;
