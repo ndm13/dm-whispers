@@ -7,15 +7,11 @@ A bridge between Discord DMs and WebSockets
 - `nodemon.json`, `tsconfig.json`: Basic config files for NodeMon and TypeScript, respectively.
 
 ## What's Not Here
-- `src/secrets.json`: Secrets for Discord, in the following format:
-  ```json
-  {
-    "discord": {
-      "token": "<Discord bot API token>",
-      "clientId": "<Discord bot client ID>"
-    }
-  }
+- `.env`: Secrets for Discord, in the following format:
+  ```dotenv
+  DISCORD_TOKEN="<your token here>"
   ```
+  Alternatively, these can be passed as environment variables.
 
 ## Payloads
 Currently a minimal implementation designed for expansion, the server sends the user ID, user name, and the message text

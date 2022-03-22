@@ -1,5 +1,5 @@
+import 'dotenv/config';
 import {Client, Intents} from "discord.js";
-import {discord} from './secrets.json';
 import {WebSocketServer} from 'ws';
 
 const client = new Client({
@@ -11,7 +11,7 @@ const client = new Client({
     }
 });
 client.once('ready', () => console.log("[Discord.js] Client ready"));
-client.login(discord.token)
+client.login(process.env.DISCORD_TOKEN)
     .then(() => console.log("[Discord.js] Authenticated"))
     .catch(e => console.log("[Discord.js] Authentication failed:", e));
 
@@ -24,7 +24,7 @@ const users = {};
 server.on('connection', socket => {
     console.log("[WebSocket ] Connection established");
     client.on('messageCreate', message => {
-        if (message.author.id === discord.clientId) return;
+        if (message.author.id === client.application.id) return;
         console.log("[Discord.js] [" + message.author.id + "]", message.content);
         users["" + message.author.id] = message.author;
         socket.send(JSON.stringify({
